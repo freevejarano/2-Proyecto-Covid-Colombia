@@ -20,10 +20,13 @@ urlDatos = 'https://datosabiertos.bogota.gov.co/api/3/action/datastore_search_sq
 #Consulta SQL a la API
 urlDatosSQL1 = 'sql=SELECT "LOCALIDAD_ASIS" as localidad, count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "LOCALIDAD_ASIS" order by "LOCALIDAD_ASIS"'
 urlDatosSQL2 = 'sql=SELECT "FECHA_DIAGNOSTICO", count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "FECHA_DIAGNOSTICO" order by "FECHA_DIAGNOSTICO"'
+urlDatosSQL3 = 'sql=SELECT "SEXO" as gen, count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "SEXO" order by "SEXO"'
 
-#Peitición de datos, conversión de json a lista de diccionarios
+
+
+#Petición de datos, conversión de json a lista de diccionarios
 req1 = requests.get(url=urlDatos+urlDatosSQL1)
-reqJson1 = req1.json() #Organizar datos
+reqJson1 = req1.json()
 ndict1=reqJson1['result']['records']
 
 #Organización de localidades, correción de los casos "sin dato"
@@ -39,7 +42,7 @@ for x in ndict1:
 
 #Gráfico de Torta Casos Por Localidad
 fig1, ax1 = plt.subplots(figsize=(20,20))
-plt.title("CASOS CONFIRMADOS POR LOCALIDAD DE COVID-19 EN BOGOTA\n", fontdict={'fontsize':15})
+plt.title("CASOS CONFIRMADOS POR LOCALIDAD DE COVID-19 EN BOGOTÁ\n", fontdict={'fontsize':15})
 ax1.pie(cantloca, labels=localidad, autopct='%1.1f%%',
         shadow=True, startangle=90)
 ax1.axis('equal')
@@ -47,9 +50,9 @@ ax1.axis('equal')
 #plt.savefig(fname, bbox_inches='tight')
 
 
-#Peitición de datos, conversión de json a lista de diccionarios
+#Petición de datos, conversión de json a lista de diccionarios
 req2 = requests.get(url=urlDatos+urlDatosSQL2)
-reqJson2 = req2.json() #Organizar datos
+reqJson2 = req2.json()
 ndict2=reqJson2['result']['records']
 
 #Correción formato de fecha
@@ -95,11 +98,28 @@ plt.bar(meses, cant)
 #plt.savefig(fname, bbox_inches='tight')
 plt.tight_layout()
 
+
+#Petición de datos, conversión de json a lista de diccionarios
+req3 = requests.get(url=urlDatos+urlDatosSQL3)
+reqJson3 = req3.json()
+ndict3=reqJson3['result']['records']
+
+#Organización de Datos por Género
+genero=['Mujeres','Hombres']
+cantgen=[int(ndict3[0]['cantidad']),int(ndict3[1]['cantidad'])]
+
+
+#Gráfico de Torta Casos Por Género
+fig1, ax1 = plt.subplots(figsize=(9,7))
+plt.title("CASOS CONFIRMADOS POR GÉNERO DE COVID-19 EN BOGOTÁ\n", fontdict={'fontsize':15})
+ax1.pie(cantgen, labels=genero, autopct='%1.1f%%',
+        shadow=True, startangle=90)
+ax1.axis('equal')
+
+#fname="GraficoTorta_Genero_Covid_Bogota_"+hoy+".png"
+#plt.savefig(fname, bbox_inches='tight')
+
 #Muestra todos los gráficos
 plt.show()
-
-
-
-
 
 
