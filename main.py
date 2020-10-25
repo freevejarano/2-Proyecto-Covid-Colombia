@@ -21,6 +21,7 @@ urlDatos = 'https://datosabiertos.bogota.gov.co/api/3/action/datastore_search_sq
 urlDatosSQL1 = 'sql=SELECT "LOCALIDAD_ASIS" as localidad, count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "LOCALIDAD_ASIS" order by "LOCALIDAD_ASIS"'
 urlDatosSQL2 = 'sql=SELECT "FECHA_DIAGNOSTICO", count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "FECHA_DIAGNOSTICO" order by "FECHA_DIAGNOSTICO"'
 urlDatosSQL3 = 'sql=SELECT "SEXO" as gen, count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "SEXO" order by "SEXO"'
+urlDatosSQL4 = 'sql=SELECT "EDAD" as edad, count(*) as cantidad from "b64ba3c4-9e41-41b8-b3fd-2da21d627558" group by "EDAD" order by "EDAD"'
 
 
 
@@ -119,7 +120,38 @@ ax1.axis('equal')
 #fname="GraficoTorta_Genero_Covid_Bogota_"+hoy+".png"
 #plt.savefig(fname, bbox_inches='tight')
 
+
+
+#Petición de datos, conversión de json a lista de diccionarios
+req4 = requests.get(url=urlDatos+urlDatosSQL4)
+reqJson4 = req4.json()
+ndict4=reqJson4['result']['records']
+
+#Clasificación de Edades Por Segmentos
+agecant=[0,0,0,0,0]
+age=['NIÑOS\n0-12\naños','ADOLESCENTES\n13-18\naños','JOVENES\n19-26\naños','ADULTOS\n26-59\naños','ANCIANOS\n60+\naños']
+for x in ndict4:
+    if (isinstance(x['edad'], str)):
+        aux= int(x['edad'])
+        aux2= int(x['cantidad'])
+        if aux<12:
+            agecant[0]+=aux2
+        elif (aux>=12 and aux<=18):
+            agecant[1]+=aux2
+        elif (aux>18 and aux<=26):
+            agecant[2]+=aux2
+        elif (aux>26 and aux<=59):
+            agecant[3] += aux2
+        else :
+            agecant[4]+=aux2
+
+#Gráfica de Barras de Casos Por Edad
+fig, ax = plt.subplots(figsize=(10,10))
+ax.set_ylabel('Número de Casos')
+ax.set_title('CASOS CONFIRMADOS DE COVID-19 EN BOGOTÁ POR EDAD')
+plt.bar(age, agecant)
+#fname="GraficoBarras_Edad_Covid_Bogota_"+hoy+".png"
+#plt.savefig(fname, bbox_inches='tight')
+
 #Muestra todos los gráficos
 plt.show()
-
-
